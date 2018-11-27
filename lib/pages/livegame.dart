@@ -17,7 +17,7 @@ class Livegame extends StatelessWidget {
   Widget build(BuildContext context) {
     return new MaterialApp(
       //home: new LivegameView(channel: IOWebSocketChannel.connect("ws://iafoosball.aau.dk:9003/users/"+tableID+"/user-1")),
-      home: new LivegameView(channel: IOWebSocketChannel.connect("ws://192.168.0.129:9003/users/"+tableID+"/"+globals.user_id)),
+      home: new LivegameView(channel: IOWebSocketChannel.connect("ws://"+globals.server+":"+globals.port+"/users/"+tableID+"/"+globals.user_id)),
     );
   }
   
@@ -100,12 +100,237 @@ class LivegameViewState extends State<LivegameView> with TickerProviderStateMixi
               //  matchitem.started == null ? 
               //Livegame view
                 toreturn = new Scaffold(
-                  appBar: new AppBar(
-                    title: new Text("Live game"),
-                    leading: new Text(snapshot.connectionState.toString()),
-                  ),
+                    body: new Padding(
+                    padding: new EdgeInsets.symmetric(vertical: 50.0, horizontal: 0.0),
+                    child: new Column( 
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        //Score
+                        new Expanded(
+                          flex: 1,
+                          child:
+                          new Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: <Widget>[
+                            new Column(
+                              mainAxisSize: MainAxisSize.max,
+                              children: <Widget>[
+                                new BText("Red")
+                              ],
+                            ),
+                            new Column(
+                              mainAxisSize: MainAxisSize.max,
+
+                              children: <Widget>[
+                                new BText(matchitem.scoreRed.toString())
+                              ],
+                            ),
+                            new Column(
+                              mainAxisSize: MainAxisSize.max,
+
+                              children: <Widget>[
+                                new BText("-")
+                              ],
+                            ),
+                            new Column(
+                              mainAxisSize: MainAxisSize.max,
+
+                              children: <Widget>[
+                                new BText(matchitem.scoreBlue.toString())
+                              ],
+                            ),
+                            new Column(
+                              mainAxisSize: MainAxisSize.max,
+
+                              children: <Widget>[
+                                new BText("Blue")
+                              ],
+                            ),
+                          ],
+                        ),
+                        ),
+                        new Expanded(
+                          flex: 10,
+                          child:
+                        new Container(
+                          alignment: Alignment.topLeft,
+                        decoration: new BoxDecoration(
+                          image: new DecorationImage(
+                            image: new AssetImage("images/foosball.png"),
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                        child: new Container (
+                              child:new Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children:<Widget>[ 
+                                  //redside
+                                new Row(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                   new RedSide(widget.channel, matchitem),
+                                ],
+                              ),
+                              new Padding(padding: EdgeInsets.all(8),),
+                              //blueside
+                                new Row(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  new BlueSide(widget.channel, matchitem),
+                                ],
+                              ),
+                              ]
+                              ),
+                            ),
+                        ),
+                        ),
+
+
+                        new Divider(
+                        color: Colors.black54,
+                      ),
+                      //Option button
+                      new Row(
+                         mainAxisSize: MainAxisSize.max,
+                        children: <Widget>[
+                          new Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                            children:<Widget>[new GestureDetector(
+                              onTap: () {
+                                final snackBar = SnackBar(content: Text("end game"));
+                                Scaffold.of(context).showSnackBar(snackBar);
+                              },
+                              child: new Container(
+                                padding:EdgeInsets.all(10.0),
+                                margin: EdgeInsets.all(2.0),
+                                color: Colors.green,
+                                child: new Text("End game",style: new TextStyle(color: Colors.white)),
+                              )
+                            ),
+                            ]
+                            ),
+                        ],
+                      ),
+                      new Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          
+                      new Column(
+                        mainAxisSize: MainAxisSize.max,
+                        children: <Widget>[
+                          new Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                            children:<Widget>[new GestureDetector(
+                              onTap: () {
+                                final snackBar = SnackBar(content: Text("+1 goal red"));
+                                widget.channel.sink.add('{ "command": "addGoal", "values": { "speed": 1, "side": "red", "position": "attack"  }}');
+                                Scaffold.of(context).showSnackBar(snackBar);
+                              },
+                              child: new Container(
+                                padding:EdgeInsets.all(10.0),
+                                margin: EdgeInsets.all(2.0),
+                                color: Colors.red,
+                                child: new Text("+1 goal red",style: new TextStyle(color: Colors.white)),
+                              ),
+                            ),
+                            ]
+                            ),
+                            new Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                            children:<Widget>[new GestureDetector(
+                              onTap: () {
+                                final snackBar = SnackBar(content: Text("-1 goal red"));
+                                Scaffold.of(context).showSnackBar(snackBar);
+                                widget.channel.sink.add('{ "command": "removeGoal", "values": { "side": "red" }}');
+                              },
+                              child: new Container(
+                                margin: EdgeInsets.all(2.0),
+                                padding:EdgeInsets.all(10.0),
+                                color: Colors.red,
+                                child: new Text("-1 goal red",style: new TextStyle(color: Colors.white)),
+                              )
+                            ),
+                            ]
+                            ),
+                        ],),
+                        new Column(
+                        mainAxisSize: MainAxisSize.max,
+                        children: <Widget>[
+                        new Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                            children:<Widget>[new GestureDetector(
+                              onTap: () {
+                                final snackBar = SnackBar(content: Text("+1 goal blue"));
+                                Scaffold.of(context).showSnackBar(snackBar);
+                                widget.channel.sink.add('{ "command": "addGoal", "values": { "speed": 1, "side": "blue", "position": "attack"  }}');
+                              },
+                              child: new Container(
+                                padding:EdgeInsets.all(10.0),
+                                margin: EdgeInsets.all(2.0),
+                                color: Colors.blue,
+                                child: new Text("+1 goal blue",style: new TextStyle(color: Colors.white)),
+                              )
+                            ),
+                            ]
+                          ),
+                          new Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                            children:<Widget>[new GestureDetector(
+                              onTap: () {
+                                final snackBar = SnackBar(content: Text("-1 goal blue"));
+                                widget.channel.sink.add('{ "command": "removeGoal", "values": { "side": "blue" }}');
+                                Scaffold.of(context).showSnackBar(snackBar);
+                              },
+                              child: new Container(
+                                padding:EdgeInsets.all(10.0),
+                                margin: EdgeInsets.all(2.0),
+                                color: Colors.blue,
+                                child: new Text("-1 goal blue",style: new TextStyle(color: Colors.white)),
+                              )
+                            ),
+                            ]
+                            ),
+                        ],
+                      ),
+                        ]
+                      ),
+
+
+                        /*
+                        new Expanded(
+                          child:
+                            new Container (
+                              padding: new EdgeInsets.all(8.0),
+                              child:new Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children:<Widget>[ Row(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  new BlueSide(widget.channel, matchitem),
+                                  //Red side
+                                  new RedSide(widget.channel, matchitem),
+                                ],
+                              ),
+                              ]
+                              ),
+                            ),
+                        )
+                        */
+                      ],
+                    ),
+                    )
+                )
+                
+                /*
+                new Scaffold(
                   body: new Padding(
-                  padding: new EdgeInsets.symmetric(vertical: 0.0, horizontal: 0.0),
+                  padding: new EdgeInsets.symmetric(vertical: 10.0, horizontal: 0.0),
                   child: new Column( 
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     mainAxisSize: MainAxisSize.min,
@@ -115,23 +340,37 @@ class LivegameViewState extends State<LivegameView> with TickerProviderStateMixi
                       child:
                       new Row(
                         mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.max,
                         children: <Widget>[
-                          new Text("Red ",
-                          style: new TextStyle(
-                            fontSize: 40.0,
+                          new Column(
+                            children: <Widget>[
+                              new Container(
+                                color: Color.fromARGB(100, 255, 0, 0),
+                                child: new Row(
+                                  children: <Widget>[
+                                    new Text("Red ",
+                                      style: new TextStyle(
+                                        fontSize: 40.0,
+                                      ),
+                                      textAlign: TextAlign.left
+                                      ),
+                                      new Container(
+                                      color:Colors.red,
+                                      child: new Text(matchitem.scoreRed.toString(),
+                                      style: new TextStyle(
+                                        fontSize: 40.0,
+                                        color: Colors.white,
+                                      ),
+                                      textAlign: TextAlign.center
+                                      ),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                              
+                            ],
                           ),
-                          textAlign: TextAlign.center
-                          ),
-                          new Container(
-                          color:Colors.red,
-                          child: new Text("1 ",
-                          style: new TextStyle(
-                            fontSize: 40.0,
-                            color: Colors.white,
-                          ),
-                          textAlign: TextAlign.center
-                          ),
-                          ),
+                          
                           new Text(":",
                           style: new TextStyle(
                             fontSize: 40.0,
@@ -140,7 +379,7 @@ class LivegameViewState extends State<LivegameView> with TickerProviderStateMixi
                           ),
                           new Container(
                           color:Colors.blue,
-                          child: new Text("2 ",
+                          child: new Text(matchitem.scoreBlue.toString(),
                           style: new TextStyle(
                             fontSize: 40.0,
                             color: Colors.white,
@@ -152,7 +391,7 @@ class LivegameViewState extends State<LivegameView> with TickerProviderStateMixi
                           style: new TextStyle(
                             fontSize: 40.0,
                           ),
-                          textAlign: TextAlign.center
+                          textAlign: TextAlign.right
                           ),
                         ]
                       ),
@@ -167,90 +406,9 @@ class LivegameViewState extends State<LivegameView> with TickerProviderStateMixi
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                      
-                          //Blue side
-                          new Expanded(
-                            flex: 1,
-                            child: new Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.max,
-                            children: <Widget>[
-                              new Text("Blue side",textAlign: TextAlign.center,style: new TextStyle(fontSize:16.0,height: 2.0)),
-                              new GestureDetector(
-                                    
-                                    onTap: () {
-                                      final snackBar = SnackBar(content: Text("Blue Att"));
-                                      Scaffold.of(context).showSnackBar(snackBar);
-                                    },
-                                    child: 
-                              new CircleAvatar(
-                                backgroundColor: Colors.blue,
-                                radius: 50.0,
-                                child: new Icon(FontAwesomeIcons.bullseye,size: 50.0),
-                              ),),
-                              new Padding(padding: EdgeInsets.all(4.0),),
-                              new GestureDetector(
-                                    onTap: () {
-                                      matchitem.positions.blueDefense != null ? 
-                                      Scaffold.of(context).showSnackBar(SnackBar(content: Text("Position taken")))
-                                      :
-                                      Scaffold.of(context).showSnackBar(SnackBar(content: Text("Blue def")));
-                                      print("Set pos");
-                                      widget.channel.sink.add(' { "command": "setPosition", "values": { "side": "blue", "position": "defense" }}');
-                                      
-                                    },
-                                    child: matchitem.positions.blueDefense != null ? 
-                                    new CircleAvatar(
-                                      backgroundColor: Colors.blue,
-                                      radius: 50.0,
-                                      child: new Text(matchitem.positions.blueDefense),
-                                    )
-                                    :
-                                    new CircleAvatar(
-                                      backgroundColor: Colors.blue,
-                                      radius: 50.0,
-                                      child: new Icon(FontAwesomeIcons.shieldAlt,size: 50.0),
-                                    )),
-                                ],
-                              ),
-                          ),
+                          new BlueSide(widget.channel, matchitem),
                           //Red side
-                          new Expanded(
-                            flex: 1,
-                            child:
-                              new Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: <Widget>[
-                                  new Text("Red side",textAlign: TextAlign.center,style: new TextStyle(fontSize:16.0,height: 2.0)),
-                                  new GestureDetector(
-                                    onTap: () {
-                                      final snackBar = SnackBar(content: Text("Red Att"));
-                                      Scaffold.of(context).showSnackBar(snackBar);
-                                    },
-                                    child: new CircleAvatar(
-                                      backgroundColor: Colors.red,
-                                      radius: 50.0,
-                                      child: new Icon(FontAwesomeIcons.gavel,size: 50.0,),
-                                    ),
-                                  ),
-                              
-                              new Padding(padding: EdgeInsets.all(4.0),),
-                              new GestureDetector(
-                                    onTap: () {
-                                      final snackBar = SnackBar(content: Text("Red def"));
-                                      Scaffold.of(context).showSnackBar(snackBar);
-                                    },
-                                    child:
-                              new CircleAvatar(
-                                backgroundColor: Colors.red,
-                                radius: 50.0,
-                                child: new Icon(FontAwesomeIcons.shieldAlt,size: 50.0),
-                              )),
-                                ],
-                              ),
-                          ),
+                          new RedSide(widget.channel, matchitem),
                         ],
                       ),
                       new Text("Admin options",style:new TextStyle(fontSize: 16.0)),
@@ -280,29 +438,73 @@ class LivegameViewState extends State<LivegameView> with TickerProviderStateMixi
                         ],
                       ),
                       new Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          
+                      new Column(
                         mainAxisSize: MainAxisSize.max,
                         children: <Widget>[
-                          new Column(
+                          new Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                             children:<Widget>[new GestureDetector(
                               onTap: () {
-                                final snackBar = SnackBar(content: Text("-1 goal red"));
+                                final snackBar = SnackBar(content: Text("+1 goal red"));
+                                widget.channel.sink.add('{ "command": "addGoal", "values": { "speed": 1, "side": "red", "position": "attack"  }}');
                                 Scaffold.of(context).showSnackBar(snackBar);
                               },
                               child: new Container(
                                 padding:EdgeInsets.all(10.0),
                                 margin: EdgeInsets.all(2.0),
                                 color: Colors.red,
+                                child: new Text("+1 goal red",style: new TextStyle(color: Colors.white)),
+                              ),
+                            ),
+                            ]
+                            ),
+                            new Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                            children:<Widget>[new GestureDetector(
+                              onTap: () {
+                                final snackBar = SnackBar(content: Text("-1 goal red"));
+                                Scaffold.of(context).showSnackBar(snackBar);
+                                widget.channel.sink.add('{ "command": "removeGoal", "values": { "side": "red" }}');
+                              },
+                              child: new Container(
+                                margin: EdgeInsets.all(2.0),
+                                padding:EdgeInsets.all(10.0),
+                                color: Colors.red,
                                 child: new Text("-1 goal red",style: new TextStyle(color: Colors.white)),
                               )
                             ),
                             ]
                             ),
-                          new Column(
+                        ],),
+                        new Column(
+                        mainAxisSize: MainAxisSize.max,
+                        children: <Widget>[
+                        new Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                            children:<Widget>[new GestureDetector(
+                              onTap: () {
+                                final snackBar = SnackBar(content: Text("+1 goal blue"));
+                                Scaffold.of(context).showSnackBar(snackBar);
+                                widget.channel.sink.add('{ "command": "addGoal", "values": { "speed": 1, "side": "blue", "position": "attack"  }}');
+                              },
+                              child: new Container(
+                                padding:EdgeInsets.all(10.0),
+                                margin: EdgeInsets.all(2.0),
+                                color: Colors.blue,
+                                child: new Text("+1 goal blue",style: new TextStyle(color: Colors.white)),
+                              )
+                            ),
+                            ]
+                          ),
+                          new Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                             children:<Widget>[new GestureDetector(
                               onTap: () {
                                 final snackBar = SnackBar(content: Text("-1 goal blue"));
+                                widget.channel.sink.add('{ "command": "removeGoal", "values": { "side": "blue" }}');
                                 Scaffold.of(context).showSnackBar(snackBar);
                               },
                               child: new Container(
@@ -314,65 +516,32 @@ class LivegameViewState extends State<LivegameView> with TickerProviderStateMixi
                             ),
                             ]
                             ),
-                          new Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                            children:<Widget>[new GestureDetector(
-                              onTap: () {
-                                final snackBar = SnackBar(content: Text("+1 goal blue"));
-                                Scaffold.of(context).showSnackBar(snackBar);
-                              },
-                              child: new Container(
-                                padding:EdgeInsets.all(10.0),
-                                margin: EdgeInsets.all(2.0),
-                                color: Colors.blue,
-                                child: new Text("+1 goal blue",style: new TextStyle(color: Colors.white)),
-                              )
-                            ),
-                            ]
-                            ),
-                          new Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                            children:<Widget>[new GestureDetector(
-                              onTap: () {
-                                final snackBar = SnackBar(content: Text("+1 goal red"));
-                                Scaffold.of(context).showSnackBar(snackBar);
-                              },
-                              child: new Container(
-                                margin: EdgeInsets.all(2.0),
-                                padding:EdgeInsets.all(10.0),
-                                color: Colors.red,
-                                child: new Text("+1 goal red",style: new TextStyle(color: Colors.white)),
-                              )
-                            ),
-                            ]
-                            ),
                         ],
                       ),
                         ],
                       ),
+                        ],
+                      )
                       ),
                       ),
                     ],
                   ),
                   ),
                 )
+                */
                 : 
                 //Lobby view
                 toreturn = new Scaffold(
-                  appBar: new AppBar(
-                    title: new Text("Lobby"),
-                    leading: new Text(snapshot.connectionState.toString()),
-                  ),
                   body: new Padding(
-                  padding: new EdgeInsets.symmetric(vertical: 0.0, horizontal: 0.0),
-                  child: new Column( 
+                  padding: new EdgeInsets.symmetric(vertical: 20.0, horizontal: 0.0),
+                  child: new Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
                       new Container (
                       padding: new EdgeInsets.all(8.0),
                       child:
-                      new Text("Gamemode",
+                      new Text("Pick a position",
                       style: new TextStyle(
                         fontSize: 20.0,
                       ),
@@ -389,128 +558,44 @@ class LivegameViewState extends State<LivegameView> with TickerProviderStateMixi
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                      
-                          //Blue side
-                          new Expanded(
-                            flex: 1,
-                            child: new Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.max,
-                            children: <Widget>[
-                              new Text("Blue side",textAlign: TextAlign.center,style: new TextStyle(fontSize:16.0,height: 2.0)),
-                              new GestureDetector(
-                                    onTap: () {
-                                      final snackBar = SnackBar(content: Text("Blue att"));
-                                      Scaffold.of(context).showSnackBar(snackBar);
-                                      widget.channel.sink.add(' { "command": "setPosition", "values": { "side": "blue", "position": "attack" }}');
-                                    },
-                                    child: matchitem.positions.blueAttack != null ? 
-                                    new CircleAvatar(
-                                      backgroundColor: Colors.blue,
-                                      radius: 50.0,
-                                      child: new Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: <Widget>[
-                                          new Icon(FontAwesomeIcons.bullseye,size: 20.0),
-                                          new  Text(matchitem.positions.blueAttack),
-                                        ],
-                                    )
-                                    )
-                                    :
-                                    new CircleAvatar(
-                                      backgroundColor: Colors.blue,
-                                      radius: 50.0,
-                                      child: new Icon(FontAwesomeIcons.bullseye,size: 50.0),
-                                    )),
-                              new Padding(padding: EdgeInsets.all(4.0),),
-                              new GestureDetector(
-                                    onTap: () {
-                                      final snackBar = SnackBar(content: Text("Blue def"));
-                                      Scaffold.of(context).showSnackBar(snackBar);
-                                      widget.channel.sink.add(' { "command": "setPosition", "values": { "side": "blue", "position": "defense" }}');
-                                    },
-                                    child: matchitem.positions.blueDefense != null ? 
-                                    new CircleAvatar(
-                                      backgroundColor: Colors.blue,
-                                      radius: 50.0,
-                                      child: new Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: <Widget>[
-                                          new Icon(FontAwesomeIcons.shieldAlt,size: 20.0),
-                                          new  Text(matchitem.positions.blueDefense),
-                                        ],
-                                    )
-                                    )
-                                    :
-                                    new CircleAvatar(
-                                      backgroundColor: Colors.blue,
-                                      radius: 50.0,
-                                      child: new Icon(FontAwesomeIcons.shieldAlt,size: 50.0),
-                                    )),
-                                ],
-                              ),
+                      new Expanded(
+                          flex: 10,
+                          child:
+                        new Container(
+                          alignment: Alignment.topLeft,
+                        decoration: new BoxDecoration(
+                          image: new DecorationImage(
+                            image: new AssetImage("images/foosball.png"),
+                            fit: BoxFit.contain,
                           ),
-                          //Red side
-                          new Expanded(
-                            flex: 1,
-                            child:
-                              new Column(
+                        ),
+                        child: new Container (
+                              child:new Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children:<Widget>[ 
+                                  //redside
+                                new Row(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
-                                  new Text("Red side",textAlign: TextAlign.center,style: new TextStyle(fontSize:16.0,height: 2.0)),
-                                  new GestureDetector(
-                                    onTap: () {
-                                      final snackBar = SnackBar(content: Text("red att"));
-                                      Scaffold.of(context).showSnackBar(snackBar);
-                                      widget.channel.sink.add(' { "command": "setPosition", "values": { "side": "red", "position": "attack" }}');
-                                    },
-                                    child: matchitem.positions.redAttack != null ? 
-                                    new CircleAvatar(
-                                      backgroundColor: Colors.red,
-                                      radius: 50.0,
-                                      child: new Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: <Widget>[
-                                          new Icon(FontAwesomeIcons.bullseye,size: 20.0),
-                                          new  Text(matchitem.positions.redAttack),
-                                        ],
-                                    ))
-                                    :
-                                    new CircleAvatar(
-                                      backgroundColor: Colors.red,
-                                      radius: 50.0,
-                                      child: new Icon(FontAwesomeIcons.bullseye,size: 50.0),
-                                    )),
-                              
-                              new Padding(padding: EdgeInsets.all(4.0),),
-                              new GestureDetector(
-                                    onTap: () {
-                                      final snackBar = SnackBar(content: Text("Red def"));
-                                      Scaffold.of(context).showSnackBar(snackBar);
-                                      widget.channel.sink.add(' { "command": "setPosition", "values": { "side": "red", "position": "defense" }}');
-                                    },
-                                    child: matchitem.positions.redDefense != null ? 
-                                    new CircleAvatar(
-                                      backgroundColor: Colors.red,
-                                      radius: 50.0,
-                                      child: new Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: <Widget>[
-                                          new Icon(FontAwesomeIcons.shieldAlt,size: 20.0),
-                                          new  Text(matchitem.positions.redDefense),
-                                        ],
-                                    ))
-                                    :
-                                    new CircleAvatar(
-                                      backgroundColor: Colors.red,
-                                      radius: 50.0,
-                                      child: new Icon(FontAwesomeIcons.shieldAlt,size: 50.0),
-                                    )),
+                                   new RedSide(widget.channel, matchitem),
                                 ],
                               ),
-                          ),
+                              new Padding(padding: EdgeInsets.all(8),),
+                              //blueside
+                                new Row(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  new BlueSide(widget.channel, matchitem),
+                                ],
+                              ),
+                              ]
+                              ),
+                            ),
+                        ),
+                        ),
                         ],
                       ),
                       new Padding(padding: EdgeInsets.all(4.0),),
@@ -530,6 +615,8 @@ class LivegameViewState extends State<LivegameView> with TickerProviderStateMixi
                         onChanged: (String val) {
                           print(val);
                           _SelectdType = val;
+                          String toserver = val.replaceAll("1v1", "oneOnOne").replaceAll("2v2", "twoOnTwo").replaceAll("2v1", "twoOnOne");
+                          widget.channel.sink.add('{ "command": "settings", "values": { "'+toserver+'": true }}');
                           setState(() {});
                         },
                       ),
@@ -540,6 +627,7 @@ class LivegameViewState extends State<LivegameView> with TickerProviderStateMixi
                             onTap: () {
                               final snackBar = SnackBar(content: Text("Start game"));
                               Scaffold.of(context).showSnackBar(snackBar);
+                              widget.channel.sink.add('{ "command": "started"}'); 
                             },
                             child: new Container(
                               padding:EdgeInsets.all(10.0),
@@ -554,13 +642,27 @@ class LivegameViewState extends State<LivegameView> with TickerProviderStateMixi
                       ),
                       ),
                       //Spectators
-                      new Text("Spectators",style:new TextStyle(fontSize: 16.0)),
+                      new GestureDetector(
+                        onTap: (){
+                          print("Join spectator");
+                          widget.channel.sink.add(' { "command": "setPosition", "values": { "side": "spectator", "position": "null" }}');
+                          
+                        },
+                        child: new Row(
+                          children: <Widget>[
+                            new Text("Spectators   join",style:new TextStyle(fontSize: 16.0)),
+                            new Icon(FontAwesomeIcons.plus)
+                          ],
+                        )
+
+                        
+                      ),
                       new Divider(
                         color: Colors.black54,
                       ),
                       new Container(
                         padding: new EdgeInsets.all(8.0),
-                        height: 120.0,
+                        height: 100.0,
                         child:new ListView.builder(
                             itemExtent: 100.0,
                             physics: new BouncingScrollPhysics(),
@@ -582,7 +684,8 @@ class LivegameViewState extends State<LivegameView> with TickerProviderStateMixi
                                     ));
                                 }
                               },
-                      ),),
+                      ),
+                      ),
                     ],
                   ),
                   ),
@@ -602,3 +705,215 @@ class LivegameViewState extends State<LivegameView> with TickerProviderStateMixi
     controller?.dispose();
   }
 }
+
+class BText extends StatelessWidget{
+  final String text;
+
+  BText(this.text);
+
+  @override
+  Widget build(BuildContext context){
+    return Text(text,style: new TextStyle(fontSize: 20.0),);
+  }
+
+}
+
+class BlueSide extends StatelessWidget{
+
+final WebSocketChannel channel;
+final LiveItem matchitem;
+
+BlueSide(this.channel,this.matchitem);
+
+  @override
+  Widget build(BuildContext context){
+    return new Expanded(
+      flex: 1,
+      child: new Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisSize: MainAxisSize.max,
+      children: <Widget>[
+      //  new Text("Blue side",textAlign: TextAlign.center,style: new TextStyle(fontSize:16.0,height: 2.0)),
+      new GestureDetector(
+              onTap: () {
+                final snackBar = SnackBar(content: Text("Blue def"));
+                Scaffold.of(context).showSnackBar(snackBar);
+                channel.sink.add(' { "command": "setPosition", "values": { "side": "blue", "position": "defense" }}');
+              },
+              child: matchitem.positions.blueDefense != null ? 
+              new CircleAvatar(
+                backgroundColor: Colors.blue,
+                radius: 30.0,
+                child: new Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    new Expanded(
+                      flex: 1,
+                      child:
+                      new ListView(
+                        scrollDirection: Axis.horizontal,
+                        children: <Widget>[
+                          new Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                                    new Icon(FontAwesomeIcons.shieldAlt,size: 15.0),
+                                    new  Text(matchitem.positions.blueDefense),
+                            ]
+                          ),
+                        ],
+                      )
+                    ),
+                  ],
+              )
+              )
+              :
+              new CircleAvatar(
+                backgroundColor: Colors.blue,
+                radius: 30.0,
+                child: new Icon(FontAwesomeIcons.shieldAlt,size: 30.0),
+              )),      
+        new Padding(padding: EdgeInsets.all(32),),
+        new GestureDetector(
+              onTap: () {
+                final snackBar = SnackBar(content: Text("Blue att"));
+                Scaffold.of(context).showSnackBar(snackBar);
+                channel.sink.add(' { "command": "setPosition", "values": { "side": "blue", "position": "attack" }}');
+              },
+              child: matchitem.positions.blueAttack != null ? 
+              new CircleAvatar(
+                backgroundColor: Colors.blue,
+                radius: 30.0,
+                child: new Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    new Expanded(
+                      flex: 1,
+                      child:
+                      new ListView(
+                        scrollDirection: Axis.horizontal,
+                        children: <Widget>[
+                          new Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                                    new Icon(FontAwesomeIcons.bullseye,size: 15.0),
+                                    new  Text(matchitem.positions.blueAttack),
+                            ]
+                          ),
+                        ],
+                      )
+                    ),
+                  ],
+              )
+              )
+              :
+              new CircleAvatar(
+                backgroundColor: Colors.blue,
+                radius: 30.0,
+                child: new Icon(FontAwesomeIcons.bullseye,size: 30.0),
+              )),
+          ],
+        ),
+    );
+  }
+}
+
+class RedSide extends StatelessWidget {
+
+final WebSocketChannel channel;
+final LiveItem matchitem;
+
+RedSide(this.channel,this.matchitem);
+
+@override
+  Widget build(BuildContext context) {
+  return new Expanded(
+    flex: 1,
+    child: new Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+         // new Text("Red side",textAlign: TextAlign.center,style: new TextStyle(fontSize:16.0,height: 2.0)),
+          new GestureDetector(
+            onTap: () {
+              final snackBar = SnackBar(content: Text("red att"));
+              Scaffold.of(context).showSnackBar(snackBar);
+              channel.sink.add(' { "command": "setPosition", "values": { "side": "red", "position": "attack" }}');
+            },
+            child: matchitem.positions.redAttack != null ? 
+            new CircleAvatar(
+              backgroundColor: Colors.red,
+              radius: 30.0,
+              child: new Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                    new Expanded(
+                      flex: 1,
+                      child:
+                      new ListView(
+                        scrollDirection: Axis.horizontal,
+                        children: <Widget>[
+                          new Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                                    new Icon(FontAwesomeIcons.bullseye,size: 15.0),
+                                    new  Text(matchitem.positions.redAttack),
+                            ]
+                          ),
+                        ],
+                      )
+                    ),
+                  ],
+            ))
+            :
+            new CircleAvatar(
+              backgroundColor: Colors.red,
+              radius: 30.0,
+              child: new Icon(FontAwesomeIcons.bullseye,size: 30.0),
+            )),
+      
+        new Padding(padding: EdgeInsets.all(32),),
+      new GestureDetector(
+            onTap: () {
+              final snackBar = SnackBar(content: Text("Red def"));
+              Scaffold.of(context).showSnackBar(snackBar);
+              channel.sink.add(' { "command": "setPosition", "values": { "side": "red", "position": "defense" }}');
+            },
+            child: matchitem.positions.redDefense != null ? 
+            new CircleAvatar(
+              backgroundColor: Colors.red,
+              radius: 30.0,
+              child: new Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                    new Expanded(
+                      flex: 1,
+                      child:
+                      new ListView(
+                        scrollDirection: Axis.horizontal,
+                        children: <Widget>[
+                          new Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                                    new Icon(FontAwesomeIcons.shieldAlt,size: 15.0),
+                                    new  Text(matchitem.positions.redDefense),
+                            ]
+                          ),
+                        ],
+                      )
+                    ),
+                  ],
+            ))
+            :
+            new CircleAvatar(
+              backgroundColor: Colors.red,
+              radius: 30.0,
+              child: new Icon(FontAwesomeIcons.shieldAlt,size: 30.0),
+            )),
+        ],
+      ),
+  );
+  }
+}
+
+

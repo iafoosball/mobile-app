@@ -7,6 +7,7 @@ import 'package:isolate/isolate.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:ia/tools/globals.dart' as globals;
 
 class ActivetableList extends StatelessWidget {
 /*
@@ -42,12 +43,12 @@ class ActiveTableViewState extends State<ActiveTableView> {
     super.initState();
     fetchTables();
   }
+  
 
 Future<List<MatchItem>> fetchTables() async {
   print("Here1");
   
-  final response = await http.get('http://192.168.0.129:9003/matches');
-  //final response = await client.get('http://iafoosball.aau.dk:9003/matches');
+  final response = await http.get('http://'+globals.server+':'+globals.port+'/matches');
 
     setState(() {
       list = parseTables(response.body);
@@ -83,36 +84,36 @@ List<MatchItem> parseTables(String responseBody) {
           onRefresh: fetchTables,
           key: refreshKey,
           child: list==null||list.length == 0 ? new ListView(
-                      padding: new EdgeInsets.all(10.0),
-                      children: <Widget>[
-                        new Card(
-                          child: new Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: <Widget>[
-                              new Expanded(
-                                //   padding: new EdgeInsets.all(5.0),
-                                child: new Container(
-                                  padding: new EdgeInsets.all(8.0),
-                                  child: new Column(
-                                    mainAxisSize: MainAxisSize.max,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      new Text(
-                                        "No matches",
-                                        style: new TextStyle(
-                                          fontSize: 20.0,
-                                          height: 2.0,
-                                        ),
+                    padding: new EdgeInsets.all(10.0),
+                    children: <Widget>[
+                      new Card(
+                        child: new Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: <Widget>[
+                            new Expanded(
+                              //   padding: new EdgeInsets.all(5.0),
+                              child: new Container(
+                                padding: new EdgeInsets.all(8.0),
+                                child: new Column(
+                                  mainAxisSize: MainAxisSize.max,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    new Text(
+                                      "No matches",
+                                      style: new TextStyle(
+                                        fontSize: 20.0,
+                                        height: 2.0,
                                       ),
-                                      new Text("Find a table and create one"),
-                                    ],
-                                  ),
+                                    ),
+                                    new Text("Find a table and create one"),
+                                  ],
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ]
+                      ),
+                    ]
                   )
                   :
                   new ListView.builder(

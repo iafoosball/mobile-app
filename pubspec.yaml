@@ -10,6 +10,8 @@ dependencies:
   cupertino_icons: ^0.1.0
   isolate: ^2.0.2
   font_awesome_flutter: 8.1.0
+  web_socket_channel: ^1.0.9
+  http: ^0.12.0
   flutter_sidekick: 0.1.1
 
 dev_dependencies:
@@ -27,3 +29,4 @@ flutter:
     - images/foosball_table.jpg
     - images/drawer.jpg
     - images/placer.png
+    - images/foosball.png
