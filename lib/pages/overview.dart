@@ -28,69 +28,12 @@ class HomeViewState extends State<HomeView> {
       resizeToAvoidBottomPadding: true,
       body: new ListView(
           children: [
-            new Image(
-             image: new AssetImage( "images/foosball_table.jpg"),
-              width: 600.0,
-              height: 240.0,
-            ),
-            tableCode,
+            new FeedCard(),
+
           ],
       ),
     );
   }
-  Widget tableCode = new Container(
-      padding: const EdgeInsets.all(32.0),
-      child: new Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          new Expanded(
-            child: new Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                new Container(
-                  width: 200.0,
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: new Text(
-                    'Login to table',
-                    style: new TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20.0,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                new Container(
-                  width: 200.0,
-                  child: new TextField(
-                    onChanged: _onChanged,
-                    keyboardType: TextInputType.number,
-                    maxLength: 4,
-                    maxLengthEnforced: true,
-                    style: new TextStyle(
-                      fontSize: 40.0,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                      letterSpacing: 14.0
-                    ),
-                    textAlign: TextAlign.center,
-                    controller: _controller,
-                    decoration: new InputDecoration(
-                      filled: true,
-                      fillColor: Colors.black12,
-                      border: InputBorder.none,
-                      counterStyle: new TextStyle(
-                        fontSize: 0.0
-                      )
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
 
   
   sideMenu(){
@@ -99,6 +42,41 @@ class HomeViewState extends State<HomeView> {
 //TODO add server stuff and go to lobby
   static void _onChanged(String text){
     print("asd "+text);
+  }
+
+}
+
+class FeedCard extends StatelessWidget{
+
+  @override
+  Widget build(BuildContext context) {
+    return new Card(
+      child: new Container(
+        padding: EdgeInsets.all(10.0),
+      child: new Column(
+        children: <Widget>[
+          new Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              new Text("Feed example, tournament",style: new TextStyle(fontSize: 20.0),),
+              Align(child: new Icon(Icons.more_vert),alignment: Alignment.topLeft)
+              
+            ],
+          ),
+          new Container(
+            padding: EdgeInsets.all(4.0),
+            child:
+              Text(
+        '''
+Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+        ''',
+        softWrap: true,
+      ),
+          )
+        ],
+      ),
+      ),
+    );
   }
 
 }

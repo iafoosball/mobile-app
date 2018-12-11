@@ -62,7 +62,7 @@ Future<List<MatchItem>> fetchTables() async {
 
 List<MatchItem> parseTables(String responseBody) {
   print("Parsetables");
-    print(responseBody);
+  print(responseBody);
   final parsed = json.decode(responseBody).cast<Map<String, dynamic>>();
   print(parsed.map<MatchItem>((json) => MatchItem.fromJson(json)).toList());
   return parsed.map<MatchItem>((json) => MatchItem.fromJson(json)).toList();
@@ -72,12 +72,6 @@ List<MatchItem> parseTables(String responseBody) {
 @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      appBar: new AppBar(
-        title: new Text("Active Tables"),
-        actions: <Widget>[
-          new IconButton(icon: new Icon(Icons.playlist_add))
-        ],
-      ),
       
       body: 
       new RefreshIndicator(

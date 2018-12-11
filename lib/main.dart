@@ -11,9 +11,19 @@ import 'package:ia/pages/ws.dart';
 import 'package:ia/pages/livegame.dart';
 import 'package:ia/pages/activetables.dart';
 import 'package:ia/tools/drawer.dart';
+import 'package:device_info/device_info.dart';
+import 'package:ia/tools/globals.dart' as globals;
 
 void main() {
   runApp(new FoosballApp());
+  getDevice();
+  }
+  
+  Future getDevice() async {
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+    print('Running on ${androidInfo.model}');
+    globals.user_id = androidInfo.model;
 }
 
 final MyDrawer _drawer = new MyDrawer();
@@ -22,6 +32,7 @@ final MyDrawer _drawer = new MyDrawer();
 //final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
 class FoosballApp extends StatelessWidget {
+  
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
@@ -107,7 +118,7 @@ class _MainPageState extends State<MainPage> {
 
   FocusNode focus = new FocusNode();
 
-  List pageNames = ["Overview", "Tables"];
+  List pageNames = ["Feed", "Tables"];
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +128,7 @@ class _MainPageState extends State<MainPage> {
       body: new PageView(
         children: [
           new Overview(),
-          new Tableoverview(),
+          new ActiveTableView(),
         ],
         onPageChanged: onPageChanged,
         controller: _pageController,
@@ -129,7 +140,7 @@ class _MainPageState extends State<MainPage> {
           new BottomNavigationBarItem(
               icon: new Icon(Icons.home), title: new Text("Home")),
           new BottomNavigationBarItem(
-              icon: new Icon(Icons.info), title: new Text("Overview Tables")),
+              icon: new Icon(Icons.play_circle_outline), title: new Text("Active tables")),
         ],
         onTap: navigationTap,
         currentIndex: _page,
