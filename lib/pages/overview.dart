@@ -6,6 +6,7 @@ class Overview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
+      debugShowCheckedModeBanner:false,
       home: new HomeView(),
     );
   }
@@ -28,7 +29,8 @@ class HomeViewState extends State<HomeView> {
       resizeToAvoidBottomPadding: true,
       body: new ListView(
           children: [
-            new FeedCard(),
+            new FeedCard("Feed example, tournament"),
+            new FeedCard("Another example, news"),
 
           ],
       ),
@@ -47,18 +49,22 @@ class HomeViewState extends State<HomeView> {
 }
 
 class FeedCard extends StatelessWidget{
+  final String text;
+
+  FeedCard(this.text);
 
   @override
   Widget build(BuildContext context) {
     return new Card(
+      elevation: 1.5,
       child: new Container(
-        padding: EdgeInsets.all(10.0),
+        padding: EdgeInsets.all(16.0),
       child: new Column(
         children: <Widget>[
           new Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              new Text("Feed example, tournament",style: new TextStyle(fontSize: 20.0),),
+              new Text(text,style: new TextStyle(fontSize: 20.0),),
               Align(child: new Icon(Icons.more_vert),alignment: Alignment.topLeft)
               
             ],

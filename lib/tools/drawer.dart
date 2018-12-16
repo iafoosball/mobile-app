@@ -47,10 +47,11 @@ class _MyDrawerState extends State<MyDrawer> {
                   ),
                 ),
                 new Container(
-                  height: 20.0,
+                  height: 10.0,
                 ),
                 new CircleAvatar(
-                  radius: 30.0,
+                  radius: 40.0,
+                  backgroundImage: AssetImage("images/profile.jpg"),
                   foregroundColor: Colors.red,
                   backgroundColor: Colors.white,
                 )

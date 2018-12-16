@@ -16,7 +16,7 @@ class Livegame extends StatelessWidget {
 @override
   Widget build(BuildContext context) {
     return new MaterialApp(
-      //home: new LivegameView(channel: IOWebSocketChannel.connect("ws://iafoosball.aau.dk:9003/users/"+tableID+"/user-1")),
+      //home: new LivegameView(channel: IOWebSocketChannel.connect("ws://iafoosball1.aau.dk:9003/users/"+tableID+"/user-1")),
       home: new LivegameView(channel: IOWebSocketChannel.connect("ws://"+globals.server+":"+globals.port+"/users/"+tableID+"/"+globals.user_id)),
     );
   }
@@ -68,338 +68,404 @@ class LivegameViewState extends State<LivegameView> with TickerProviderStateMixi
   StreamBuilder(
     stream: widget.channel.stream,
     builder: (context, snapshot) {
-                if (snapshot.hasError){
-                  print("snapshot errrrror "+snapshot.error.toString()+" data "+snapshot.data.toString());
-                }
-                print(snapshot.connectionState);
-                print(snapshot.data);
+      if (snapshot.hasError){
+        print("snapshot errrrror "+snapshot.error.toString()+" data "+snapshot.data.toString());
+      }
+      print(snapshot.connectionState);
+      print(snapshot.data);
 
-                var toreturn = new Scaffold(body:Center(child: CircularProgressIndicator()));
+      var toreturn = new Scaffold(body:Center(child: CircularProgressIndicator()));
 
-                if(snapshot.hasData){
-                var userpositions = new Map(); 
-                LiveItem matchitem = LiveItem.fromJson(json.decode(snapshot.data));
-                if(matchitem.positions!=null){
-                if(matchitem.positions.blueAttack!=null){
-                  userpositions[matchitem.positions.blueAttack] = "bAtt";
-                }
-                if(matchitem.positions.blueDefense!=null){
-                  userpositions[matchitem.positions.blueDefense] = 'bDef';
+      if(snapshot.hasData){
+      var userpositions = new Map(); 
+      var spectators = [];
+      LiveItem matchitem = LiveItem.fromJson(json.decode(snapshot.data));
+      if(matchitem.positions!=null){
+      if(matchitem.positions.blueAttack!=null){
+        userpositions[matchitem.positions.blueAttack] = "bAtt";
+      }
+      if(matchitem.positions.blueDefense!=null){
+        userpositions[matchitem.positions.blueDefense] = 'bDef';
 
-                }
-                if(matchitem.positions.redAttack!=null){
-                  userpositions[matchitem.positions.redAttack] = 'rAtt';
+      }
+      if(matchitem.positions.redAttack!=null){
+        userpositions[matchitem.positions.redAttack] = 'rAtt';
 
-                }
-                if(matchitem.positions.redDefense!=null){
-                  userpositions[matchitem.positions.redDefense] = 'rDef';
+      }
+      if(matchitem.positions.redDefense!=null){
+        userpositions[matchitem.positions.redDefense] = 'rDef';
 
-                }
-                }
-                matchitem.started != null&& matchitem.started==true ? 
-              //  matchitem.started == null ? 
-              //Livegame view
-                toreturn = new Scaffold(
-                    body: new Padding(
-                    padding: new EdgeInsets.symmetric(vertical: 50.0, horizontal: 0.0),
-                    child: new Column( 
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        //Score
-                        new Expanded(
-                          flex: 1,
-                          child:
-                          new Row(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: <Widget>[
-                            new Column(
-                              mainAxisSize: MainAxisSize.max,
-                              children: <Widget>[
-                                new BText("Red")
-                              ],
-                            ),
-                            new Column(
-                              mainAxisSize: MainAxisSize.max,
+      }
+      }
 
-                              children: <Widget>[
-                                new BText(matchitem.scoreRed.toString())
-                              ],
-                            ),
-                            new Column(
-                              mainAxisSize: MainAxisSize.max,
+      print(matchitem.users.length);
+      for(var i = 0;i<matchitem.users.length;i++){
+      if(userpositions.containsKey(matchitem.users[i].id)){
+          print("Here123123");
+      }else{
+        print("nothere123123");
+        spectators.add(matchitem.users[i].id);
+      }
+      }
 
-                              children: <Widget>[
-                                new BText("-")
-                              ],
-                            ),
-                            new Column(
-                              mainAxisSize: MainAxisSize.max,
-
-                              children: <Widget>[
-                                new BText(matchitem.scoreBlue.toString())
-                              ],
-                            ),
-                            new Column(
-                              mainAxisSize: MainAxisSize.max,
-
-                              children: <Widget>[
-                                new BText("Blue")
-                              ],
-                            ),
-                          ],
-                        ),
-                        ),
-                        new Expanded(
-                          flex: 10,
-                          child:
-                        new Container(
-                          alignment: Alignment.topLeft,
-                        decoration: new BoxDecoration(
-                          image: new DecorationImage(
-                            image: new AssetImage("images/foosball.png"),
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                        child: new Container (
-                              child:new Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children:<Widget>[ 
-                                  //redside
-                                new Row(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                   new RedSide(widget.channel, matchitem),
-                                ],
-                              ),
-                              new Padding(padding: EdgeInsets.all(8),),
-                              //blueside
-                                new Row(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  new BlueSide(widget.channel, matchitem),
-                                ],
-                              ),
-                              ]
-                              ),
-                            ),
-                        ),
-                        ),
-
-
-                        new Divider(
-                        color: Colors.black54,
-                      ),
-                      //Option button
-                      /*
-                      new Row(
-                         mainAxisSize: MainAxisSize.max,
-                        children: <Widget>[
-                          new Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                            children:<Widget>[new GestureDetector(
-                              onTap: () {
-                                final snackBar = SnackBar(content: Text("end game"));
-                                Scaffold.of(context).showSnackBar(snackBar);
-                              },
-                              child: new RoundButtom("End game", Colors.green, "", widget.channel)
-                            ),
-                            ]
-                            ),
-                        ],
-                      ),
-                      */
-                      new Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          
-                      new Column(
-                        mainAxisSize: MainAxisSize.max,
-                        children: <Widget>[
-                          new Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                            children:<Widget>[
-                              new RoundButtom("+1 Red", Colors.red, '{ "command": "addGoal", "values": { "speed": 0, "side": "red", "position": "attack"  }}', widget.channel)
-                            ]
-                            ),
-                            new Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                            children:<Widget>[
-                              new RoundButtom("-1 Red", Colors.red, '{ "command": "removeGoal", "values": { "side": "red" }}', widget.channel)
-                            ]
-                            ),
-                        ],),
-                        new Column(
-                        mainAxisSize: MainAxisSize.max,
-                        children: <Widget>[
-                        new Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                            children:<Widget>[
-                              new RoundButtom("+1 Blue", Colors.blue, '{ "command": "addGoal", "values": { "speed": 0, "side": "blue", "position": "attack"  }}', widget.channel)
-                            ]
-                          ),
-                          new Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                            children:<Widget>[new RoundButtom("-1 Blue", Colors.blue, '{ "command": "removeGoal", "values": { "side": "blue" }}', widget.channel)
-                            ]
-                            ),
-                        ],
-                      ),
-                        ]
-                      ),
-                      ],
-                    ),
-                    )
-                )
-                : 
-                //Lobby view
-                toreturn = new Scaffold(
-                  body: new Padding(
-                  padding: new EdgeInsets.symmetric(vertical: 20.0, horizontal: 0.0),
-                  child: new Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    mainAxisSize: MainAxisSize.min,
+      matchitem.started != null&& matchitem.started==true ? 
+    //  matchitem.started == null ? 
+    //Livegame view
+      toreturn = new Scaffold(
+        appBar: new AppBar(
+              centerTitle: true,
+              backgroundColor: Colors.lightBlue[800],
+              title: new Text("Live Match",textAlign: TextAlign.center)
+          ),
+          body: new Padding(
+          padding: new EdgeInsets.symmetric(vertical: 10.0, horizontal: 0.0),
+          child: new Column( 
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              
+              //Score
+            new Card(
+              margin: EdgeInsets.only(top: 8.0,bottom: 8.0),
+              elevation: 2,
+              child: 
+              new Container(
+                height: 40.0,
+                padding: EdgeInsets.only(top: 8.0,bottom: 8.0),
+              child:
+                new Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  new Column(
+                    mainAxisSize: MainAxisSize.max,
                     children: <Widget>[
-                      new Container (
-                      padding: new EdgeInsets.all(8.0),
-                      child:
-                      new Text("Pick a position",
-                      style: new TextStyle(
-                        fontSize: 20.0,
-                      ),
-                      textAlign: TextAlign.center
-                      ),
-                      ),
-                      //Text side row
-
-                      new Expanded(
-                          flex: 10,
-                          child:
-                        new Container(
-                          alignment: Alignment.topLeft,
-                        decoration: new BoxDecoration(
-                          image: new DecorationImage(
-                            image: new AssetImage("images/foosball.png"),
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                        child: new Container (
-                              child:new Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children:<Widget>[ 
-                                  //redside
-                                new Row(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                   new RedSide(widget.channel, matchitem),
-                                ],
-                              ),
-                              new Padding(padding: EdgeInsets.all(8),),
-                              //blueside
-                                new Row(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  new BlueSide(widget.channel, matchitem),
-                                ],
-                              ),
-                              ]
-                              ),
-                            ),
-                        ),
-                        ),
-
-                      new Padding(padding: EdgeInsets.all(4.0),),
-                      //Settings dropdown
-                      new Text("Settings",style:new TextStyle(fontSize: 16.0)),
-                      new Divider(
-                        color: Colors.black54,
-                      ),
-                      new DropdownButton<String>(
-                        items: <String>['1v1', '2v2', 'Switch', 'Tournament Mode'].map((String value) {
-                          return new DropdownMenuItem<String>(
-                            value: value,
-                            child: new Text(value),
-                          );
-                        }).toList(),
-                        hint:Text(_SelectdType),
-                        onChanged: (String val) {
-                          print(val);
-                          _SelectdType = val;
-                          String toserver = val.replaceAll("1v1", "oneOnOne").replaceAll("2v2", "twoOnTwo").replaceAll("2v1", "twoOnOne").replaceAll("Tournament Mode", "tournamentMode");
-                          widget.channel.sink.add('{ "command": "settings", "values": { "'+toserver+'": true }}');
-                          setState(() {});
-                        },
-                      ),
-                      //Start button
-                      new Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                          children:<Widget>[
-                            new RoundButtom("Start",Colors.green,'{ "command": "started"}',widget.channel),
-                          ]
-                      ),
-
-
-
-                      //Spectators
-                      new GestureDetector(
-                        onTap: (){
-                          print("Join spectator");
-                          widget.channel.sink.add(' { "command": "setPosition", "values": { "side": "spectator", "position": "null" }}');
-                          
-                        },
-                        child: new Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            new Text("Spectators",style:new TextStyle(fontSize: 16.0)),
-                            new Icon(FontAwesomeIcons.plus)
-                          ],
-                        )
-
-                        
-                      ),
-                      new Divider(
-                        color: Colors.black54,
-                      ),
-                      new Container(
-                        padding: new EdgeInsets.all(8.0),
-                        height: 100.0,
-                        child:new ListView.builder(
-                            itemExtent: 100.0,
-                            physics: new BouncingScrollPhysics(),
-                            scrollDirection: Axis.horizontal,
-                              itemCount: matchitem.users.length,
-                              itemBuilder: (BuildContext context, i) {
-                                if(userpositions.containsKey(matchitem.users[i].id)){
-
-                                  return null;
-                                }else{
-
-                                return new Sidekick(
-                                  tag: "s_user-1",
-                                  child: 
-                                  new CircleAvatar(
-                                    radius: 60.0,
-                                    backgroundColor: Colors.blueGrey,
-                                    child:new Text(matchitem.users[i].id)
-                                    ));
-                                }
-                              },
-                      ),
-                      ),
+                      new BText("Red")
                     ],
                   ),
-                  ),
-                );
-                }
+                  new Column(
+                    mainAxisSize: MainAxisSize.max,
 
-                return toreturn;
+                    children: <Widget>[
+                      new BText(matchitem.scoreRed.toString())
+                    ],
+                  ),
+                  new Column(
+                    mainAxisSize: MainAxisSize.max,
+
+                    children: <Widget>[
+                      new BText("-")
+                    ],
+                  ),
+                  new Column(
+                    mainAxisSize: MainAxisSize.max,
+
+                    children: <Widget>[
+                      new BText(matchitem.scoreBlue.toString())
+                    ],
+                  ),
+                  new Column(
+                    mainAxisSize: MainAxisSize.max,
+
+                    children: <Widget>[
+                      new BText("Blue")
+                    ],
+                  ),
+                ],
+              ),
+              ),
+              ),
+              
+            new Card(
+              elevation: 2,
+              child: 
+              new Container(
+                padding: EdgeInsets.all(8.0),
+                alignment: Alignment.topLeft,
+              decoration: new BoxDecoration(
+                image: new DecorationImage(
+                  image: new AssetImage("images/foosball1.png"),
+                  fit: BoxFit.contain,
+                ),
+              ),
+              child: new Container (
+                    child:new Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children:<Widget>[ 
+                        //redside
+                      new Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                          new RedSide(widget.channel, matchitem),
+                      ],
+                    ),
+                    new Padding(padding: EdgeInsets.all(8),),
+                    //blueside
+                      new Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        new BlueSide(widget.channel, matchitem),
+                      ],
+                    ),
+                    ]
+                    ),
+                  ),
+              ),
+              ),
+            //Option button
+            /*
+            new Row(
+                mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                new Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                  children:<Widget>[new GestureDetector(
+                    onTap: () {
+                      final snackBar = SnackBar(content: Text("end game"));
+                      Scaffold.of(context).showSnackBar(snackBar);
+                    },
+                    child: new RoundButtom("End game", Colors.green, "", widget.channel)
+                  ),
+                  ]
+                  ),
+              ],
+            ),
+            */
+            new Card(
+              elevation: 2,
+              child:
+              new Container(
+                padding: EdgeInsets.only(top: 8.0,bottom: 8.0),
+                child: 
+            new Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                
+            new Column(
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                new Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                  children:<Widget>[
+                    new GoalBotton("+1 Red", Colors.red[600], '{ "command": "addGoal", "values": { "speed": 0, "side": "red", "position": "attack"  }}', widget.channel)
+                  ]
+                  ),
+                  new Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                  children:<Widget>[
+                    new GoalBotton("-1 Red", Colors.red[600], '{ "command": "removeGoal", "values": { "side": "red" }}', widget.channel)
+                  ]
+                  ),
+              ],),
+              new Column(
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+              new Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                  children:<Widget>[
+                    new GoalBotton("+1 Blue", Colors.blue[600], '{ "command": "addGoal", "values": { "speed": 0, "side": "blue", "position": "attack"  }}', widget.channel)
+                  ]
+                ),
+                new Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                  children:<Widget>[new GoalBotton("-1 Blue", Colors.blue[600], '{ "command": "removeGoal", "values": { "side": "blue" }}', widget.channel)
+                  ]
+                  ),
+              ],
+            ),
+              ]
+            ),
+            ),
+            ),
+            ],
+          ),
+          )
+      )
+      : 
+      //Lobby view
+      toreturn = new Scaffold(
+        appBar: new AppBar(
+              centerTitle: true,
+              backgroundColor: Colors.lightBlue[800],
+              title: new Text("Pick a position",textAlign: TextAlign.center)
+        ),
+        body: new Padding(
+        padding: new EdgeInsets.symmetric(vertical: 20.0, horizontal: 0.0),
+        child: new Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            //Text side row
+
+            new Card(
+                child:
+              new Container(
+                padding: EdgeInsets.all(8.0),
+                alignment: Alignment.topLeft,
+              decoration: new BoxDecoration(
+                image: new DecorationImage(
+                  image: new AssetImage("images/foosball1.png"),
+                  fit: BoxFit.contain,
+                ),
+              ),
+              child: new Container (
+                    child:new Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children:<Widget>[ 
+                        //redside
+                      new Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                          new RedSide(widget.channel, matchitem),
+                      ],
+                    ),
+                    new Padding(padding: EdgeInsets.all(8),),
+                    //blueside
+                      new Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        new BlueSide(widget.channel, matchitem),
+                      ],
+                    ),
+                    ]
+                    ),
+                  ),
+              ),
+              ),
+
+            //Settings dropdown
+            new Card(
+              elevation: 2.0,
+              margin: EdgeInsets.only(top: 8.0,bottom: 8.0),
+              child:
+              new Column(
+              children:<Widget>[
+            new Container(
+              child: new Text("Game Mode",style:new TextStyle(fontSize: 24.0),textAlign: TextAlign.center,),
+            ),
+            new Container(
+              alignment: Alignment(0, 0),
+              child: 
+              new Text("2v2",style: TextStyle(fontSize: 20.0),),
+              /*
+            new DropdownButton<String>(
+              elevation: 8,
+              items: <String>['1v1', '2v2', 'Switch', 'Tournament Mode'].map((String value) {
+                return new DropdownMenuItem<String>(
+                  value: value,
+                  child: new Text(value),
+                );
+              }).toList(),
+              hint:Text(_SelectdType),
+              onChanged: (String val) {
+                print(val);
+                _SelectdType = val;
+                String toserver = val.replaceAll("1v1", "oneOnOne").replaceAll("2v2", "twoOnTwo").replaceAll("2v1", "twoOnOne").replaceAll("Tournament Mode", "tournamentMode");
+                widget.channel.sink.add('{ "command": "settings", "values": { "'+toserver+'": true }}');
+                setState(() {});
+              },
+            ),*/
+            ),
+            //Start button
+            /*
+            new Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+                children:<Widget>[
+                  new MaterialButton(
+                    elevation: 4,
+                    height: 50.0,
+                    color: Colors.green[600],
+                    child: new Text("Start",style: TextStyle(color: Colors.white),),
+                  ),
+                 // new RoundButtom("Start",Colors.green,'{ "command": "started"}',widget.channel),
+                ]
+            ),
+            */
+            new Padding(
+        padding: new EdgeInsets.symmetric(vertical: 10.0, horizontal: 0.0),),
+                ]
+              ),
+            ),
+
+            //Spectators
+            new Card(
+              elevation: 2.0,
+              child: new Column(
+                children: <Widget>[
+            new Container(
+              height: 40.0,
+              child:    
+            new GestureDetector(
+              onTap: (){
+                print("Join spectator");
+                widget.channel.sink.add(' { "command": "setPosition", "values": { "side": "spectator", "position": "null" }}');
+                
+              },
+              child: new Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  new Text("Spectators",style:new TextStyle(fontSize: 24.0)),
+                  new Icon(Icons.add)
+                ],
+              )
+
+              
+            ),
+            ),
+            new Container(
+              height: 60.0,
+              child:new ListView.builder(
+                  itemExtent: 80.0,
+                  physics: new BouncingScrollPhysics(),
+                  scrollDirection: Axis.horizontal,
+                    itemCount: spectators.length,
+                    itemBuilder: (BuildContext context, i) {
+                      return new CircleAvatar(
+                          backgroundColor: Colors.blueGrey[800],
+                          radius: 30.0,
+                          child: new Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              new Expanded(
+                                flex: 1,
+                                child:
+                                new ListView(
+                                  padding: new EdgeInsets.all(14.0),
+                                  scrollDirection: Axis.horizontal,
+                                  children: <Widget>[
+                                    new Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: <Widget>[
+                                              new  Text(spectators[i],style: TextStyle(color: Colors.white),),
+                                      ]
+                                    ),
+                                  ],
+                                )
+                              ),
+                            ],
+                        )
+                        );
+                    },
+            ),
+            ),
+            new Padding(
+        padding: new EdgeInsets.symmetric(vertical: 10.0, horizontal: 0.0),),
+          ],
+        ),
+        ),
+                ],
+              ),
+            )
+      );
+      }
+
+      return toreturn;
       }
   )
   );
@@ -410,6 +476,40 @@ class LivegameViewState extends State<LivegameView> with TickerProviderStateMixi
     widget.channel.sink.close();
     super.dispose();
     controller?.dispose();
+  }
+}
+
+
+
+class GoalBotton extends StatelessWidget{
+
+  final String text;
+  final String command;
+  final Color color;
+  final WebSocketChannel channel;
+
+  GoalBotton(this.text,this.color,this.command,this.channel);
+
+  @override
+  Widget build(BuildContext context) {
+    return new GestureDetector(
+      onTap: () {
+        final snackBar = SnackBar(content: Text(text));
+        Scaffold.of(context).showSnackBar(snackBar);
+        channel.sink.add(command); 
+      },
+      child: new MaterialButton(
+          color: color,
+                height: 40.0,
+                child: new Text(text,style: TextStyle(color: Colors.white),)
+      )
+      
+      /*new Container(
+        padding:EdgeInsets.all(10.0),
+        color: Colors.green,
+        child: new Text("Start game",style: new TextStyle(color: Colors.white)),
+      )*/
+    );
   }
 }
 
@@ -482,8 +582,8 @@ BlueSide(this.channel,this.matchitem);
               },
               child: matchitem.positions.blueDefense != null ? 
               new CircleAvatar(
-                backgroundColor: Colors.blue,
-                radius: 30.0,
+                backgroundColor: Colors.blue[600],
+                radius: 50.0,
                 child: new Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
@@ -497,7 +597,7 @@ BlueSide(this.channel,this.matchitem);
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
                                     new Icon(FontAwesomeIcons.shieldAlt,size: 15.0),
-                                    new  Text(matchitem.positions.blueDefense),
+                                    new  Text(matchitem.positions.blueDefense,style: TextStyle(color: Colors.white,fontSize: 20.0),),
                             ]
                           ),
                         ],
@@ -508,11 +608,11 @@ BlueSide(this.channel,this.matchitem);
               )
               :
               new CircleAvatar(
-                backgroundColor: Colors.blue,
-                radius: 30.0,
-                child: new Icon(FontAwesomeIcons.shieldAlt,size: 30.0),
+                backgroundColor: Colors.blue[600],
+                radius: 50.0,
+                child: new Icon(FontAwesomeIcons.shieldAlt,size: 50.0),
               )),      
-        new Padding(padding: EdgeInsets.all(32),),
+        new Padding(padding: EdgeInsets.all(60),),
         new GestureDetector(
               onTap: () {
                 final snackBar = SnackBar(content: Text("Blue att"));
@@ -521,8 +621,8 @@ BlueSide(this.channel,this.matchitem);
               },
               child: matchitem.positions.blueAttack != null ? 
               new CircleAvatar(
-                backgroundColor: Colors.blue,
-                radius: 30.0,
+                backgroundColor: Colors.blue[600],
+                radius: 50.0,
                 child: new Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
@@ -536,7 +636,7 @@ BlueSide(this.channel,this.matchitem);
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
                                     new Icon(FontAwesomeIcons.bullseye,size: 15.0),
-                                    new  Text(matchitem.positions.blueAttack),
+                                    new  Text(matchitem.positions.blueAttack,style: TextStyle(color: Colors.white,fontSize: 20.0),),
                             ]
                           ),
                         ],
@@ -547,9 +647,9 @@ BlueSide(this.channel,this.matchitem);
               )
               :
               new CircleAvatar(
-                backgroundColor: Colors.blue,
-                radius: 30.0,
-                child: new Icon(FontAwesomeIcons.bullseye,size: 30.0),
+                backgroundColor: Colors.blue[600],
+                radius: 50.0,
+                child: new Icon(FontAwesomeIcons.bullseye,size: 50.0),
               )),
           ],
         ),
@@ -581,8 +681,8 @@ RedSide(this.channel,this.matchitem);
             },
             child: matchitem.positions.redAttack != null ? 
             new CircleAvatar(
-              backgroundColor: Colors.red,
-              radius: 30.0,
+              backgroundColor: Colors.red[600],
+              radius: 50.0,
               child: new Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -596,7 +696,7 @@ RedSide(this.channel,this.matchitem);
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
                                     new Icon(FontAwesomeIcons.bullseye,size: 15.0),
-                                    new  Text(matchitem.positions.redAttack),
+                                    new  Text(matchitem.positions.redAttack,style: TextStyle(color: Colors.white,fontSize: 20.0),),
                             ]
                           ),
                         ],
@@ -606,12 +706,12 @@ RedSide(this.channel,this.matchitem);
             ))
             :
             new CircleAvatar(
-              backgroundColor: Colors.red,
-              radius: 30.0,
-              child: new Icon(FontAwesomeIcons.bullseye,size: 30.0),
+              backgroundColor: Colors.red[600],
+              radius: 50.0,
+              child: new Icon(FontAwesomeIcons.bullseye,size: 50.0),
             )),
       
-        new Padding(padding: EdgeInsets.all(32),),
+        new Padding(padding: EdgeInsets.all(60),),
       new GestureDetector(
             onTap: () {
               final snackBar = SnackBar(content: Text("Red def"));
@@ -620,8 +720,8 @@ RedSide(this.channel,this.matchitem);
             },
             child: matchitem.positions.redDefense != null ? 
             new CircleAvatar(
-              backgroundColor: Colors.red,
-              radius: 30.0,
+              backgroundColor: Colors.red[600],
+              radius: 50.0,
               child: new Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -634,8 +734,8 @@ RedSide(this.channel,this.matchitem);
                           new Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
-                                    new Icon(FontAwesomeIcons.shieldAlt,size: 15.0),
-                                    new  Text(matchitem.positions.redDefense),
+                                    new Icon(FontAwesomeIcons.shieldAlt,size: 20.0),
+                                    new  Text(matchitem.positions.redDefense,style: TextStyle(color: Colors.white,fontSize: 20.0),),
                             ]
                           ),
                         ],
@@ -645,9 +745,9 @@ RedSide(this.channel,this.matchitem);
             ))
             :
             new CircleAvatar(
-              backgroundColor: Colors.red,
-              radius: 30.0,
-              child: new Icon(FontAwesomeIcons.shieldAlt,size: 30.0),
+              backgroundColor: Colors.red[600],
+              radius: 50.0,
+              child: new Icon(FontAwesomeIcons.shieldAlt,size: 50.0),
             )),
         ],
       ),

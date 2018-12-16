@@ -23,7 +23,11 @@ void main() {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
     print('Running on ${androidInfo.model}');
-    globals.user_id = androidInfo.model;
+    print('A id on ${androidInfo.androidId}');
+    print('Hardware on ${androidInfo.hardware}');
+    print('Id on ${androidInfo.id}');
+    print('Version on ${androidInfo.version}');
+    globals.user_id = androidInfo.hardware+"-_-"+androidInfo.androidId;
 }
 
 final MyDrawer _drawer = new MyDrawer();
@@ -36,8 +40,26 @@ class FoosballApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
+      debugShowCheckedModeBanner:false,
       title: 'IAFoosball',
       home: new MainPage(),
+      theme: ThemeData(
+        // Define the default Brightness and Colors
+        brightness: Brightness.light,
+        primaryColor: Colors.lightBlue[800],
+        accentColor: Colors.lightBlue[600],
+        
+        // Define the default Font Family
+        fontFamily: 'Montserrat',
+        
+        // Define the default TextTheme. Use this to specify the default
+        // text styling for headlines, titles, bodies of text, and more.
+        textTheme: TextTheme(
+          headline: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
+          title: TextStyle(fontSize: 36.0, fontStyle: FontStyle.italic),
+          body1: TextStyle(fontSize: 14.0, fontFamily: 'Hind'),
+        ),
+      ),
       onGenerateRoute: (RouteSettings settings) {
         switch (settings.name) {
           case '/overview': return new MyCustomRoute(
