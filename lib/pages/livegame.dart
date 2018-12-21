@@ -130,7 +130,7 @@ class LivegameViewState extends State<LivegameView> with TickerProviderStateMixi
               elevation: 2,
               child: 
               new Container(
-                height: 40.0,
+                height: 60.0,
                 padding: EdgeInsets.only(top: 8.0,bottom: 8.0),
               child:
                 new Row(
@@ -290,16 +290,23 @@ class LivegameViewState extends State<LivegameView> with TickerProviderStateMixi
         appBar: new AppBar(
               centerTitle: true,
               backgroundColor: Colors.lightBlue[800],
-              title: new Text("Pick a position",textAlign: TextAlign.center)
+              title: new Text("Lobby",textAlign: TextAlign.center)
         ),
         body: new Padding(
         padding: new EdgeInsets.symmetric(vertical: 20.0, horizontal: 0.0),
-        child: new Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
+        child: new ListView(
           children: <Widget>[
             //Text side row
-
+            new Card(
+              margin: EdgeInsets.only(top: 8.0,bottom: 8.0),
+              elevation: 2,
+              child: 
+              new Container(
+                height: 70.0,
+                padding: EdgeInsets.only(top: 8.0,bottom: 8.0),
+              child:new BText("Pick a position")
+              ),
+            ),
             new Card(
                 child:
               new Container(
@@ -347,13 +354,13 @@ class LivegameViewState extends State<LivegameView> with TickerProviderStateMixi
               new Column(
               children:<Widget>[
             new Container(
-              child: new Text("Game Mode",style:new TextStyle(fontSize: 24.0),textAlign: TextAlign.center,),
+              child: new Text("Settings",style:new TextStyle(fontSize: 24.0),textAlign: TextAlign.center,),
             ),
             new Container(
               alignment: Alignment(0, 0),
               child: 
-              new Text("2v2",style: TextStyle(fontSize: 20.0),),
-              /*
+              //new Text("2v2",style: TextStyle(fontSize: 20.0),),
+              
             new DropdownButton<String>(
               elevation: 8,
               items: <String>['1v1', '2v2', 'Switch', 'Tournament Mode'].map((String value) {
@@ -370,23 +377,26 @@ class LivegameViewState extends State<LivegameView> with TickerProviderStateMixi
                 widget.channel.sink.add('{ "command": "settings", "values": { "'+toserver+'": true }}');
                 setState(() {});
               },
-            ),*/
+            ),
             ),
             //Start button
-            /*
+            
             new Row(
               mainAxisAlignment: MainAxisAlignment.center,
                 children:<Widget>[
                   new MaterialButton(
                     elevation: 4,
-                    height: 50.0,
+                    height: 45.0,
                     color: Colors.green[600],
+                    onPressed: (){
+                      widget.channel.sink.add('{ "command": "started"}');
+                    },
                     child: new Text("Start",style: TextStyle(color: Colors.white),),
                   ),
                  // new RoundButtom("Start",Colors.green,'{ "command": "started"}',widget.channel),
                 ]
             ),
-            */
+            
             new Padding(
         padding: new EdgeInsets.symmetric(vertical: 10.0, horizontal: 0.0),),
                 ]
@@ -552,7 +562,7 @@ class BText extends StatelessWidget{
 
   @override
   Widget build(BuildContext context){
-    return Text(text,style: new TextStyle(fontSize: 20.0),);
+    return Text(text,style: new TextStyle(fontSize: 30.0),);
   }
 
 }

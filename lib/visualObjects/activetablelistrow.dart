@@ -29,12 +29,10 @@ Widget build(BuildContext context) {
                           fontSize: 20.0,
                           height: 2.0,
                         ),
+                        
                       ),
                       item.scoreBlue == null ? new Text("Game not started") : new Text("Blue score "+item.scoreBlue.toString()+" : "+item.scoreRed.toString()+" Red score"),
-                      item.users == null||item.users.length==0 ? new Text("Empty lobby") : new Text("Players in lobby:"), new Row(
-                        children: createUsertext(item.users),
-                      ),
-                      
+                      item.users == null||item.users.length==0 ? new Text("Empty lobby") : new Text("Players in lobby:"),new CreateUsertext(item.users),
                       /*
                       new ListView.builder(
                           itemExtent: 2.0,
@@ -69,7 +67,6 @@ Widget build(BuildContext context) {
     height: 120.0,
     margin: const EdgeInsets.only(top: 16.0, bottom: 8.0),
     child: new FlatButton(
-     // onPressed: () => Navigator.popAndPushNamed(context, '/livegame'),
       onPressed: () => Navigator.push(context,MaterialPageRoute(
                   builder: (context) => Livegame(tableID: item.tableID),
                 ),),
@@ -81,18 +78,48 @@ Widget build(BuildContext context) {
     ),
   );
 }
-
-List<Text> createUsertext(List<User> list) {
-  if(list!=null){
-  List<Text> childrenTexts = List<Text>();
-  for (User user in list) {
-    childrenTexts.add(new Text(user.id+", "));
-  }
-  return childrenTexts;
-  }else{
-    return List<Text>();
-  }
 }
 
+class CreateUsertext extends StatelessWidget{
 
+
+final List<User> list;
+
+CreateUsertext(this.list);
+
+  @override
+  Widget build(BuildContext context) {
+    String childrenTexts = "";
+    for (User user in list) {
+      childrenTexts += user.id+", ";
+    }
+    print(childrenTexts);
+    return  new Row(
+        mainAxisSize: MainAxisSize.max,
+        children: <Widget>[
+          new  Text(childrenTexts,style: TextStyle(color: Colors.black38),),
+        ],
+    );
+    /*
+    return  new Row(
+        mainAxisSize: MainAxisSize.max,
+        children: <Widget>[
+          new Expanded(
+            child:
+            new ListView(
+              scrollDirection: Axis.horizontal,
+              children: <Widget>[
+                new Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                          new  Text(childrenTexts,style: TextStyle(color: Colors.black38),),
+                  ]
+                ),
+              ],
+            )
+          ),
+        ],
+    );
+    */
+  }
 }

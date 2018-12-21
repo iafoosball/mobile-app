@@ -12,9 +12,15 @@ import 'package:ia/pages/livegame.dart';
 import 'package:ia/pages/activetables.dart';
 import 'package:ia/tools/drawer.dart';
 import 'package:device_info/device_info.dart';
+import 'package:flutter/services.dart';
 import 'package:ia/tools/globals.dart' as globals;
 
 void main() {
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitDown,
+    DeviceOrientation.portraitUp,
+  ]);
+  
   runApp(new FoosballApp());
   getDevice();
   }
