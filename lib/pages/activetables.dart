@@ -6,7 +6,6 @@ import 'package:ia/visualObjects/activetablelistrow.dart';
 import 'package:isolate/isolate.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:io';
-import 'package:http/http.dart' as http;
 import 'package:ia/tools/globals.dart' as globals;
 
 class ActivetableList extends StatelessWidget {
@@ -47,11 +46,17 @@ class ActiveTableViewState extends State<ActiveTableView> {
 
 Future<List<MatchItem>> fetchTables() async {
   print("Here1");
-  
-  final response = await http.get('http://'+globals.server+':'+globals.port+'/matches');
+  Uri url = Uri.parse('https://'+globals.server+':'+globals.port+'/matches');
+  var client = new HttpClient();
+  client.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+  var request = await client.getUrl(url);
+  var response = await request.close();
+  var responseBytes = (await response.toList()).expand((x) => x);
+  print(new String.fromCharCodes(responseBytes));
+  client.close();
 
     setState(() {
-      list = parseTables(response.body);
+      list = parseTables(new String.fromCharCodes(responseBytes));
     });
 
   refreshKey.currentState?.show(atTop: false);

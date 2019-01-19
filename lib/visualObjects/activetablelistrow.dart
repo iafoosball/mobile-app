@@ -100,26 +100,5 @@ CreateUsertext(this.list);
           new  Text(childrenTexts,style: TextStyle(color: Colors.black38),),
         ],
     );
-    /*
-    return  new Row(
-        mainAxisSize: MainAxisSize.max,
-        children: <Widget>[
-          new Expanded(
-            child:
-            new ListView(
-              scrollDirection: Axis.horizontal,
-              children: <Widget>[
-                new Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                          new  Text(childrenTexts,style: TextStyle(color: Colors.black38),),
-                  ]
-                ),
-              ],
-            )
-          ),
-        ],
-    );
-    */
   }
 }
