@@ -11,30 +11,20 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:flutter_sidekick/flutter_sidekick.dart';
 import 'package:ia/tools/globals.dart' as globals;
 
-
-
 class Livegame extends StatelessWidget {
   final String tableID;
   Livegame({@required this.tableID});
-  
-
-main() async {
-  SecureSocket secureSocket = await SecureSocket.connect(globals.server+"/users/"+tableID+"/"+globals.user_id, 9003,
-          onBadCertificate: (X509Certificate cert) => true) ;
-  Uri url = Uri.parse('https://'+globals.server+"/users/"+tableID+"/"+globals.user_id);
-  var client = new HttpClient();
-  client.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
-  var request = await client.getUrl(url);
-  secureSocket.cast();
-  return secureSocket;
-  }
 
 @override
   Widget build(BuildContext context) {
+/*
+    SecureSocket secureSocket = await SecureSocket.connect(globals.server+"/users/"+tableID+"/"+globals.user_id, 9003,
+          onBadCertificate: (X509Certificate cert) => true);
+    WebSocket ws = WebSocket.fromUpgradedSocket(secureSocket);
+    */
         return new MaterialApp(
-          home: new LivegameView(channel: WebSocket.fromUpgradedSocket(main()))
-,
-          //home: new LivegameView(channel: ws)
+          home: new LivegameView(channel: IOWebSocketChannel.connect("ws://"+globals.server+":9013/users/?tableID="+tableID+"&userID="+globals.user_id)),
+          //home: new LivegameView(channel: c)
         );
       }
   
@@ -42,7 +32,7 @@ main() async {
 
 class LivegameView extends StatefulWidget {
   
-final WebSocket channel;
+final WebSocketChannel channel;
 
 
   LivegameView({@required this.channel});
@@ -83,7 +73,7 @@ class LivegameViewState extends State<LivegameView> with TickerProviderStateMixi
   return new Scaffold(
       body:
   StreamBuilder(
-    stream: widget.channel,
+    stream: widget.channel.stream,
     builder: (context, snapshot) {
       if (snapshot.hasError){
         print("snapshot errrrror "+snapshot.error.toString()+" data "+snapshot.data.toString());
@@ -391,7 +381,7 @@ class LivegameViewState extends State<LivegameView> with TickerProviderStateMixi
                 print(val);
                 _SelectdType = val;
                 String toserver = val.replaceAll("1v1", "oneOnOne").replaceAll("2v2", "twoOnTwo").replaceAll("2v1", "twoOnOne").replaceAll("Tournament Mode", "tournamentMode");
-                widget.channel.add('{ "command": "settings", "values": { "'+toserver+'": true }}');
+                widget.channel.sink.add('{ "command": "settings", "values": { "'+toserver+'": true }}');
                 setState(() {});
               },
             ),
@@ -406,7 +396,7 @@ class LivegameViewState extends State<LivegameView> with TickerProviderStateMixi
                     height: 45.0,
                     color: Colors.green[600],
                     onPressed: (){
-                      widget.channel.add('{ "command": "started"}');
+                      widget.channel.sink.add('{ "command": "started"}');
                     },
                     child: new Text("Start",style: TextStyle(color: Colors.white),),
                   ),
@@ -431,7 +421,7 @@ class LivegameViewState extends State<LivegameView> with TickerProviderStateMixi
             new GestureDetector(
               onTap: (){
                 print("Join spectator");
-                widget.channel.add(' { "command": "setPosition", "values": { "side": "spectator", "position": "null" }}');
+                widget.channel.sink.add(' { "command": "setPosition", "values": { "side": "spectator", "position": "null" }}');
                 
               },
               child: new Row(
@@ -500,7 +490,7 @@ class LivegameViewState extends State<LivegameView> with TickerProviderStateMixi
 
   @override
   void dispose() {
-    widget.channel.close();
+    widget.channel.sink.close();
     super.dispose();
     controller?.dispose();
   }
@@ -513,7 +503,7 @@ class GoalBotton extends StatelessWidget{
   final String text;
   final String command;
   final Color color;
-  final WebSocket channel;
+  final WebSocketChannel channel;
 
   GoalBotton(this.text,this.color,this.command,this.channel);
 
@@ -523,7 +513,7 @@ class GoalBotton extends StatelessWidget{
       onTap: () {
         final snackBar = SnackBar(content: Text(text));
         Scaffold.of(context).showSnackBar(snackBar);
-        channel.add(command); 
+        channel.sink.add(command); 
       },
       child: new MaterialButton(
           color: color,
@@ -545,7 +535,7 @@ class RoundButtom extends StatelessWidget{
   final String text;
   final String command;
   final Color color;
-  final WebSocket channel;
+  final WebSocketChannel channel;
 
   RoundButtom(this.text,this.color,this.command,this.channel);
 
@@ -555,7 +545,7 @@ class RoundButtom extends StatelessWidget{
       onTap: () {
         final snackBar = SnackBar(content: Text(text));
         Scaffold.of(context).showSnackBar(snackBar);
-        channel.add(command); 
+        channel.sink.add(command); 
       },
       child: new CircleAvatar(
           backgroundColor: color,
@@ -586,7 +576,7 @@ class BText extends StatelessWidget{
 
 class BlueSide extends StatelessWidget{
 
-final WebSocket channel;
+final WebSocketChannel channel;
 final LiveItem matchitem;
 
 BlueSide(this.channel,this.matchitem);
@@ -605,7 +595,7 @@ BlueSide(this.channel,this.matchitem);
               onTap: () {
                 final snackBar = SnackBar(content: Text("Blue def"));
                 Scaffold.of(context).showSnackBar(snackBar);
-                channel.add(' { "command": "setPosition", "values": { "side": "blue", "position": "defense" }}');
+                channel.sink.add(' { "command": "setPosition", "values": { "side": "blue", "position": "defense" }}');
               },
               child: matchitem.positions.blueDefense != null ? 
               new CircleAvatar(
@@ -644,7 +634,7 @@ BlueSide(this.channel,this.matchitem);
               onTap: () {
                 final snackBar = SnackBar(content: Text("Blue att"));
                 Scaffold.of(context).showSnackBar(snackBar);
-                channel.add(' { "command": "setPosition", "values": { "side": "blue", "position": "attack" }}');
+                channel.sink.add(' { "command": "setPosition", "values": { "side": "blue", "position": "attack" }}');
               },
               child: matchitem.positions.blueAttack != null ? 
               new CircleAvatar(
@@ -686,7 +676,7 @@ BlueSide(this.channel,this.matchitem);
 
 class RedSide extends StatelessWidget {
 
-final WebSocket channel;
+final WebSocketChannel channel;
 final LiveItem matchitem;
 
 RedSide(this.channel,this.matchitem);
@@ -704,7 +694,7 @@ RedSide(this.channel,this.matchitem);
             onTap: () {
               final snackBar = SnackBar(content: Text("red att"));
               Scaffold.of(context).showSnackBar(snackBar);
-              channel.add(' { "command": "setPosition", "values": { "side": "red", "position": "attack" }}');
+              channel.sink.add(' { "command": "setPosition", "values": { "side": "red", "position": "attack" }}');
             },
             child: matchitem.positions.redAttack != null ? 
             new CircleAvatar(
@@ -743,7 +733,7 @@ RedSide(this.channel,this.matchitem);
             onTap: () {
               final snackBar = SnackBar(content: Text("Red def"));
               Scaffold.of(context).showSnackBar(snackBar);
-              channel.add(' { "command": "setPosition", "values": { "side": "red", "position": "defense" }}');
+              channel.sink.add(' { "command": "setPosition", "values": { "side": "red", "position": "defense" }}');
             },
             child: matchitem.positions.redDefense != null ? 
             new CircleAvatar(

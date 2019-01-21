@@ -6,6 +6,7 @@ import 'package:ia/pages/friends.dart';
 import 'package:ia/pages/settings.dart';
 import 'package:ia/pages/about.dart';
 import 'package:ia/pages/profile.dart';
+import 'package:ia/pages/mainpage.dart';
 import 'package:ia/pages/leaderboards.dart';
 import 'package:ia/pages/tableoverview.dart';
 import 'package:ia/tools/drawer.dart';
@@ -23,7 +24,7 @@ class ProfilePage extends StatelessWidget {
       onGenerateRoute: (RouteSettings settings) {
         switch (settings.name) {
           case '/overview': return new MyCustomRoute(
-            builder: (_) => new FoosballApp(),
+            builder: (_) => new MainPage(),
             settings: settings,
           );
           case '/profile': return new MyCustomRoute(

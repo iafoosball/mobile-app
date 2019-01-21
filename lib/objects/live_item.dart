@@ -51,7 +51,7 @@ factory User.fromJson(Map<String, dynamic> json){
   return new User(
 username : json['username'],
 admin : json['admin'],
-id : json['id'].toString().substring(0,json['id'].toString().indexOf("-_-")),
+id : json['id'].toString(),
   );
 }
 }
@@ -99,10 +99,10 @@ this.redAttack,
 
 factory Position.fromJson(Map<String, dynamic> json){
   return Position(
-    blueDefense :json['blueDefense'] == null ? null : json['blueDefense'].toString().substring(0,json['blueDefense'].toString().indexOf("-_-")),
-    blueAttack :json['blueAttack'] == null ? null : json['blueAttack'].toString().substring(0,json['blueAttack'].toString().indexOf("-_-")),
-    redDefense :json['redDefense'] == null ? null : json['redDefense'].toString().substring(0,json['redDefense'].toString().indexOf("-_-")),
-    redAttack :json['redAttack'] == null ? null : json['redAttack'].toString().substring(0,json['redAttack'].toString().indexOf("-_-")),
+    blueDefense :json['blueDefense'] == null ? null : json['blueDefense'].toString(),
+    blueAttack :json['blueAttack'] == null ? null : json['blueAttack'].toString(),
+    redDefense :json['redDefense'] == null ? null : json['redDefense'].toString(),
+    redAttack :json['redAttack'] == null ? null : json['redAttack'].toString(),
   );
 }
 

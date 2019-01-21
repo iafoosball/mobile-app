@@ -7,13 +7,14 @@ import 'package:ia/pages/about.dart';
 import 'package:ia/pages/profile.dart';
 import 'package:ia/pages/leaderboards.dart';
 import 'package:ia/pages/tableoverview.dart';
+import 'package:ia/pages/login.dart';
+import 'package:ia/pages/mainpage.dart';
 import 'package:ia/pages/ws.dart';
 import 'package:ia/pages/livegame.dart';
 import 'package:ia/pages/activetables.dart';
 import 'package:ia/tools/drawer.dart';
 import 'package:device_info/device_info.dart';
 import 'package:flutter/services.dart';
-import 'package:ia/tools/globals.dart' as globals;
 
 void main() {
   SystemChrome.setPreferredOrientations([
@@ -33,7 +34,8 @@ void main() {
     print('Hardware on ${androidInfo.hardware}');
     print('Id on ${androidInfo.id}');
     print('Version on ${androidInfo.version}');
-    globals.user_id = androidInfo.hardware+"-_-"+androidInfo.androidId;
+    
+
 }
 
 final MyDrawer _drawer = new MyDrawer();
@@ -48,7 +50,8 @@ class FoosballApp extends StatelessWidget {
     return new MaterialApp(
       debugShowCheckedModeBanner:false,
       title: 'IAFoosball',
-      home: new MainPage(),
+  //    home: new MainPage(),
+      home: new Login(primaryColor: Colors.red,backgroundColor: Colors.grey[200],backgroundImage: AssetImage("images/login.png")),
       theme: ThemeData(
         // Define the default Brightness and Colors
         brightness: Brightness.light,
@@ -68,13 +71,16 @@ class FoosballApp extends StatelessWidget {
       ),
       onGenerateRoute: (RouteSettings settings) {
         switch (settings.name) {
+          case '/home': return new SlideRightRoute(
+            widget: new MainPage(),
+          );
           case '/overview': return new MyCustomRoute(
-            builder: (_) => new FoosballApp(),
+            builder: (_) => new MainPage(),
             settings: settings,
           );
-          case '/profile': return new MyCustomRoute(
-            builder: (_) => new ProfilePage(),
-            settings: settings,
+          case '/profile': return new SlideRightRoute(
+            widget: new ProfilePage(),
+            //settings: settings,
           );
           case '/friends': return new MyCustomRoute(
             builder: (_) => new FriendsPage(),
@@ -131,112 +137,21 @@ class MyCustomRoute<T> extends MaterialPageRoute<T> {
   }
 }
 
-
-class MainPage extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() {
-    return new _MainPageState();
-  }
-}
-
-class _MainPageState extends State<MainPage> {
-  PageController _pageController;
-  int _page = 0;
-
-
-  FocusNode focus = new FocusNode();
-
-  List pageNames = ["Feed", "Tables"];
-
-  @override
-  Widget build(BuildContext context) {
-    return new Scaffold(
-      resizeToAvoidBottomPadding: false,
-      backgroundColor: Colors.red,
-      body: new PageView(
-        children: [
-          new Overview(),
-          new ActiveTableView(),
-        ],
-        onPageChanged: onPageChanged,
-        controller: _pageController,
-      ),
-      appBar: !focus.hasFocus ? defaultAppBar() : searchAppBar(),
-      bottomNavigationBar: new BottomNavigationBar(
-        fixedColor: Colors.blue,
-        items: [
-          new BottomNavigationBarItem(
-              icon: new Icon(Icons.home), title: new Text("Home")),
-          new BottomNavigationBarItem(
-              icon: new Icon(Icons.play_circle_outline), title: new Text("Active tables")),
-        ],
-        onTap: navigationTap,
-        currentIndex: _page,
-      ),
-      drawer: _drawer,
-    );
-  }
-
-  AppBar defaultAppBar() {
-    return new AppBar(
-        centerTitle: true,
-        actions: <Widget>[
-          new IconButton(
-            icon: _page==0 ? new Icon(null): new Icon(Icons.search),
-            onPressed: () => setState(() {
-                  FocusScope.of(context).requestFocus(focus);
-                  print("Focus " + focus.hasFocus.toString());
-                }),
-          ),
-        ],
-        title: new Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            new Text(pageNames[_page], textAlign: TextAlign.right),
-          ],
-        ));
-  }
-
-  AppBar searchAppBar() {
-    return new AppBar(
-      backgroundColor: Colors.white,
-      centerTitle: true,
-      title: new TextField(
-        focusNode: focus,
-        style: new TextStyle(
-          fontSize: 20.0,
-          color: Colors.black,
-        ),
-        decoration: new InputDecoration(
-          border: InputBorder.none,
-          hintText: "Search",
-        ),
-      ),
-    );
-  }
-
-  void navigationTap(int page) {
-    // Animating to the page.
-    // You can use whatever duration and curve you like
-    _pageController.animateToPage(page,
-        duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _pageController = new PageController();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _pageController.dispose();
-  }
-
-  void onPageChanged(int page) {
-    setState(() {
-      this._page = page;
-    });
-  }
+class SlideRightRoute extends PageRouteBuilder {
+  final Widget widget;
+  SlideRightRoute({this.widget})
+    : super(
+        pageBuilder: (BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) {
+          return widget;
+        },
+        transitionsBuilder: (BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) {
+          return new SlideTransition(
+            position: new Tween<Offset>(
+              begin: const Offset(-1.0, 0.0),
+              end: Offset.zero,
+            ).animate(animation),
+            child: child,
+           );
+         }
+      );
 }
