@@ -39,7 +39,6 @@ class _MainPageState extends State<MainPage> {
       backgroundColor: Colors.red,
       body: new PageView(
         children: [
-          new Overview(),
           new ActiveTableView(),
         ],
         onPageChanged: onPageChanged,

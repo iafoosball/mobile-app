@@ -50,8 +50,8 @@ class FoosballApp extends StatelessWidget {
     return new MaterialApp(
       debugShowCheckedModeBanner:false,
       title: 'IAFoosball',
-  //    home: new MainPage(),
-      home: new Login(primaryColor: Colors.red,backgroundColor: Colors.grey[200],backgroundImage: AssetImage("images/login.png")),
+      home: new MainPage(),
+  //    home: new Login(primaryColor: Colors.red,backgroundColor: Colors.grey[200],backgroundImage: AssetImage("images/login.png")),
       theme: ThemeData(
         // Define the default Brightness and Colors
         brightness: Brightness.light,

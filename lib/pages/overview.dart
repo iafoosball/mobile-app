@@ -74,7 +74,7 @@ class FeedCard extends StatelessWidget{
             child:
               Text(
         '''
-Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+Rediscover your passion with our new technology. We measure goals and goal speed and much more and make the information available to the palm of your hand. Compare yourself against your friends, meet up for casual games, create tournaments and how you and your friends perform. You can also create tournaments and challenge friends.
         ''',
         softWrap: true,
       ),
