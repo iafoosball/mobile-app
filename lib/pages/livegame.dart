@@ -83,10 +83,29 @@ class LivegameViewState extends State<LivegameView> with TickerProviderStateMixi
 
       var toreturn = new Scaffold(body:Center(child: CircularProgressIndicator()));
 
+
       if(snapshot.hasData){
       var userpositions = new Map(); 
       var spectators = [];
       LiveItem matchitem = LiveItem.fromJson(json.decode(snapshot.data));
+      String modeFromserver = "1v1";
+      /*
+      if(matchitem.settings.twoOnTwo!=null){
+      if(matchitem.settings.twoOnTwo){
+        modeFromserver = "2v2";
+      }
+      }
+      if(matchitem.settings.tournament!=null){
+      if(matchitem.settings.tournament){
+        modeFromserver = "tournament";
+      }
+      }
+      if(matchitem.settings.twoOnTwo!=null){
+      if(matchitem.settings.twoOnTwo){
+        modeFromserver = "2v2";
+      }
+      }
+      */
       if(matchitem.positions!=null){
       if(matchitem.positions.blueAttack!=null){
         userpositions[matchitem.positions.blueAttack] = "bAtt";
@@ -124,9 +143,9 @@ class LivegameViewState extends State<LivegameView> with TickerProviderStateMixi
               backgroundColor: Colors.lightBlue[800],
               title: new Text("Live Match",textAlign: TextAlign.center)
           ),
-          body: new Padding(
+          body: new ListView(
           padding: new EdgeInsets.symmetric(vertical: 10.0, horizontal: 0.0),
-          child: new Column( 
+          children:<Widget>[ new Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
@@ -280,10 +299,9 @@ class LivegameViewState extends State<LivegameView> with TickerProviderStateMixi
                 mainAxisAlignment: MainAxisAlignment.center,
                   children:<Widget>[new GoalBotton("-1 Blue", Colors.blue[600], '{ "command": "removeGoal", "values": { "side": "blue" }}', widget.channel)
                   ]
-                ),
+                  ),
               ],
             ),
-            
               ]
             ),
             ),
@@ -311,6 +329,7 @@ class LivegameViewState extends State<LivegameView> with TickerProviderStateMixi
             ),
             ],
           ),
+          ]
           )
       )
       : 

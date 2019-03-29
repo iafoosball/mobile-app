@@ -138,7 +138,7 @@ this.maxTime,
 factory Setting.fromJson(Map<String, dynamic> json){
   return new Setting(
     twoOnTwo:json['twoOnTwo'],
-    oneOnOne: json['oneOnOne']
+    oneOnOne: json['oneOnOne'] == null ? false : true
     ,switchPositions : json['switchPositions']
     ,twoOnOne : json['twoOnOne']
     ,bet : json['bet']
