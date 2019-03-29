@@ -1,5 +1,3 @@
-// Step 7 (Final): Change the app's theme
-
 import 'package:flutter/material.dart';
 import 'package:ia/main.dart';
 import 'package:ia/pages/friends.dart';

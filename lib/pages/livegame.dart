@@ -280,12 +280,34 @@ class LivegameViewState extends State<LivegameView> with TickerProviderStateMixi
                 mainAxisAlignment: MainAxisAlignment.center,
                   children:<Widget>[new GoalBotton("-1 Blue", Colors.blue[600], '{ "command": "removeGoal", "values": { "side": "blue" }}', widget.channel)
                   ]
-                  ),
+                ),
               ],
             ),
+            
               ]
             ),
             ),
+            ),
+            new Column(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                new Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+                children:<Widget>[
+                  new MaterialButton(
+                    elevation: 4,
+                    height: 45.0,
+                    color: Colors.purple[600],
+                    onPressed: (){
+                      widget.channel.sink.add('{ "command": "cancelMatch", "values": { }}');
+                    },
+                    child: new Text("Stopmatch",style: TextStyle(color: Colors.white),),
+                  ),
+                 // new RoundButtom("Start",Colors.green,'{ "command": "started"}',widget.channel),
+                ]
+            )
+            ],
             ),
             ],
           ),

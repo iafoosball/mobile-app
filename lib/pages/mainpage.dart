@@ -45,6 +45,7 @@ class _MainPageState extends State<MainPage> {
         controller: _pageController,
       ),
       appBar: !focus.hasFocus ? defaultAppBar() : searchAppBar(),
+      /*
       bottomNavigationBar: new BottomNavigationBar(
         fixedColor: Colors.blue,
         items: [
@@ -56,6 +57,7 @@ class _MainPageState extends State<MainPage> {
         onTap: navigationTap,
         currentIndex: _page,
       ),
+      */
       drawer: _drawer,
     );
   }
